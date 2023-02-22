@@ -9,6 +9,11 @@
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.4.1",
-    "nuxt": "^3.2.2"
+    "nuxt": "^3.2.2",
+    "nuxt-headlessui": "^1.1.1"
+  },
+  "dependencies": {
+    "@heroicons/vue": "^2.0.16",
+    "vue3-google-login": "^2.0.14"
   }
 }

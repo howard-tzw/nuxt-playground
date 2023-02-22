@@ -1,11 +1,10 @@
-<script setup lang="ts">
-const sayHi = () => {
-	console.log('hi')
-}
-</script>
-
 <template>
-	<div>
-		<BaseButton @click="sayHi" />
-	</div>
+	<NuxtLayout>
+		<NuxtLoadingIndicator />
+		<NuxtPage />
+	</NuxtLayout>
 </template>
+
+<script lang="ts" setup></script>
+
+<style lang="scss"></style>
