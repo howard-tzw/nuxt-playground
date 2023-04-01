@@ -2,7 +2,9 @@
 	<div>
 		<NuxtLink to="/">Home</NuxtLink>
 		<p v-if="pending">loading...</p>
-		<div>Hello World {{ data }}</div>
+		<div>data {{ data }}</div>
+		<div>data2 {{ data2 }}</div>
+		<div>data3 {{ data3 }}</div>
 	</div>
 </template>
 
@@ -16,6 +18,30 @@ const controller = new AbortController()
 const { data, pending } = await useAsyncData(
 	() => {
 		return apiFetch(url, {
+			signal: controller.signal,
+		})
+	},
+	{
+		server: false,
+		lazy: true,
+	},
+)
+
+const { data: data2 } = await useAsyncData(
+	() => {
+		return apiFetch('timeout2', {
+			signal: controller.signal,
+		})
+	},
+	{
+		server: false,
+		lazy: true,
+	},
+)
+
+const { data: data3 } = await useAsyncData(
+	() => {
+		return apiFetch('timeout3', {
 			signal: controller.signal,
 		})
 	},
