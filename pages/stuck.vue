@@ -1,7 +1,6 @@
 <template>
 	<div>
 		<NuxtLink to="/">Home</NuxtLink>
-		<p v-if="pending">loading...</p>
 		<div>data {{ data }}</div>
 		<div>data2 {{ data2 }}</div>
 		<div>data3 {{ data3 }}</div>
@@ -9,12 +8,11 @@
 </template>
 
 <script setup lang="ts">
-// @feat 離開頁面時，自動取消 pending 中的請求
-// 若沒有取消 pending 中的請求，跳離頁面後再回到此頁，會因為有上次 pending 的請求而導致畫面卡死，就算是 server: false 也一樣
-
 const url = '/timeout'
 
 const controller = new AbortController()
+
+// 會 stuck
 
 const { data, pending } = await useAsyncData(
 	() => {
@@ -52,8 +50,21 @@ const { data: data3 } = await useAsyncData(
 	},
 )
 
+// 不會 stuck
+// const data = ref()
+// const data2 = ref()
+// const data3 = ref()
+
+// onMounted(() => {
+// 	apiFetch(url).then(res => (data.value = res))
+// 	apiFetch('/timeout2').then(res => (data2.value = res))
+// 	apiFetch('timeout3').then(res => (data3.value = res))
+// })
+
 onBeforeUnmount(() => {
-	// controller.abort()
+	console.log('onBeforeUnmount')
+	controller.abort()
+	// clearNuxtData()
 })
 
 console.log(data.value)
