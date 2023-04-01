@@ -6,6 +6,9 @@ export default defineNuxtConfig({
 	headlessui: {
 		prefix: 'Headless',
 	},
+	routeRules: {
+		'/admin/**': { ssr: false },
+	},
 
 	runtimeConfig: {
 		public: {

@@ -9,8 +9,15 @@
 </template>
 
 <script setup lang="ts">
-// @feat 離開頁面時，自動取消 pending 中的請求
-// 若沒有取消 pending 中的請求，跳離頁面後再回到此頁，會因為有上次 pending 的請求而導致畫面卡死，就算是 server: false 也一樣
+// prerender
+// 要測兩種情況：
+// 1. 直接重新整理: prerender
+// 2. navigation: csr
+
+console.log('server-2-step-fetch')
+
+// 1. prerender 會按序 fetch api => 容易卡死畫面的主因
+// 2. navigation: 如果 lazy 皆為 true 會 parallel fetch api，如果皆為 false 則是按序
 
 const url = '/timeout'
 
@@ -23,10 +30,12 @@ const { data, pending } = await useAsyncData(
 		})
 	},
 	{
-		server: false,
+		server: true,
 		lazy: true,
 	},
 )
+
+console.log('data', data.value)
 
 const { data: data2 } = await useAsyncData(
 	() => {
@@ -35,10 +44,12 @@ const { data: data2 } = await useAsyncData(
 		})
 	},
 	{
-		server: false,
+		server: true,
 		lazy: true,
 	},
 )
+
+console.log('data2', data.value)
 
 const { data: data3 } = await useAsyncData(
 	() => {
@@ -47,14 +58,14 @@ const { data: data3 } = await useAsyncData(
 		})
 	},
 	{
-		server: false,
+		server: true,
 		lazy: true,
 	},
 )
 
+console.log('data3', data.value)
+
 onBeforeUnmount(() => {
 	controller.abort()
 })
-
-console.log(data.value)
 </script>

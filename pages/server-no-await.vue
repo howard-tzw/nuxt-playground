@@ -9,52 +9,67 @@
 </template>
 
 <script setup lang="ts">
-// @feat 離開頁面時，自動取消 pending 中的請求
-// 若沒有取消 pending 中的請求，跳離頁面後再回到此頁，會因為有上次 pending 的請求而導致畫面卡死，就算是 server: false 也一樣
+// prerender
+// 要測兩種情況：
+// 1. 直接重新整理: prerender
+// 2. navigation: csr
+
+console.log('server no await')
+
+// 1. prerender 會 parallel fetch api
+// 2. navigation: 會 parallel fetch api
 
 const url = '/timeout'
 
 const controller = new AbortController()
 
-const { data, pending } = await useAsyncData(
+const { data, pending } = useAsyncData(
 	() => {
 		return apiFetch(url, {
 			signal: controller.signal,
 		})
 	},
 	{
-		server: false,
+		server: true,
 		lazy: true,
 	},
 )
 
-const { data: data2 } = await useAsyncData(
+console.log('data', data.value)
+
+const { data: data2 } = useAsyncData(
 	() => {
 		return apiFetch('timeout2', {
 			signal: controller.signal,
 		})
 	},
 	{
-		server: false,
+		server: true,
 		lazy: true,
 	},
 )
 
-const { data: data3 } = await useAsyncData(
+console.log('data2', data.value)
+
+const { data: data3 } = useAsyncData(
 	() => {
 		return apiFetch('timeout3', {
 			signal: controller.signal,
 		})
 	},
 	{
-		server: false,
+		server: true,
 		lazy: true,
 	},
 )
 
+console.log('data3', data.value)
+
+onMounted(() => {
+	console.log(data.value, data2.value, data3.value)
+})
+
 onBeforeUnmount(() => {
 	controller.abort()
 })
-
-console.log(data.value)
 </script>
