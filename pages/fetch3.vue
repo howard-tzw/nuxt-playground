@@ -12,9 +12,10 @@
 
 const url = '/500'
 
+const { get } = useHttp()
 const { data, pending, error } = await useAsyncData(
 	() => {
-		return apiFetch(url, { retry: 0 })
+		return get(url, { retry: 0 })
 	},
 	{
 		server: false,

@@ -16,15 +16,15 @@ const url = '/secret'
 
 const controller = new AbortController()
 
-const { data, pending } = await useAsyncData(
-	() => {
-		return apiFetch(url, {
+const { get } = useHttp()
+
+const { data, pending } = await useLazyAsyncData(
+	() =>
+		get(url, {
 			signal: controller.signal,
-		})
-	},
+		}),
 	{
 		server: true, // 就算這裡是 true 也沒用！
-		lazy: true,
 	},
 )
 

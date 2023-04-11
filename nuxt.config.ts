@@ -13,6 +13,7 @@ export default defineNuxtConfig({
 	runtimeConfig: {
 		public: {
 			googleClientId: '546891899940-fob6s65qadnd5i4d0c8e2ghl9cuu15kq.apps.googleusercontent.com',
+			apiBase: 'http://localhost:5000/api/v1',
 		},
 	},
 })
