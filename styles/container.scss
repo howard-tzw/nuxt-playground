@@ -1,0 +1,47 @@
+@import './utils.scss';
+
+// ********* card *********
+
+.my-card--base {
+	@extend .my-shadow;
+	background: #ffffff;
+	border-radius: 30px;
+}
+
+.my-card {
+	@extend .my-card--base;
+	@apply container p-6 sm:p-10;
+}
+
+// ********* section *********
+
+.my-section {
+	@extend .my-card--base;
+	@apply min-h-[250px] w-full px-5 py-7 sm:p-7 lg:p-8;
+}
+
+.section-container {
+	@apply flex h-full flex-col;
+}
+
+.section-header {
+	@apply mb-4 flex flex-wrap items-start justify-between;
+}
+
+.section-title {
+	@apply text-xl font-bold;
+}
+
+.section-content {
+	@apply flex h-full flex-col justify-center;
+}
+
+// ********* dashboard *********
+
+.dashboard {
+	@apply flex flex-col space-y-4 p-7;
+}
+
+.dashboard-row {
+	@apply flex flex-row space-x-4;
+}

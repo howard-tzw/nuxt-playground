@@ -1,0 +1,26 @@
+// :root {
+// 	--header-z-index: 30;
+// 	--drawer-z-index: 30; // Notes: should not be lower than header z-index or it would be header's z-index level
+// 	--tabs-z-index: 20;
+// 	--input-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+// 	--input-border-color: rgba(60, 60, 60, 0.26);
+// 	--vselect-left-space: 0.5rem;
+// 	--vselect-right-space: 0.5rem;
+// }
+
+// body {
+// 	overflow-y: scroll; // Note: always show vertical scrollbar
+// }
+
+// h1 {
+// }
+
+// // 移除 form 相關元件的 outline
+// // https://stackoverflow.com/questions/18085053/scss-css-selector-to-select-all-input-types
+// textarea,
+// textarea.textarea,
+// select,
+// select.select,
+// input[type] {
+// 	@apply outline-0 focus:outline-0;
+// }

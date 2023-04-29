@@ -1,0 +1,71 @@
+@import './utils.scss';
+
+// Menu
+.menu-link {
+	@apply rounded-lg py-2 px-2 hover:bg-gray-300 md:flex md:min-w-[80px] md:justify-center lg:px-4;
+}
+
+.menu-link--active {
+	@apply font-semibold;
+}
+
+// Judge
+.judge-badge {
+	@apply badge border-none py-4 px-3 text-black;
+}
+
+.judge-badge--active {
+	color: white;
+	background: linear-gradient(101.6deg, #44dcfd -3.1%, #b923ff 161.36%);
+	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+	border-radius: 100px;
+}
+
+.judge-badge--inactive {
+	color: white;
+	background: linear-gradient(101.6deg, #dddddd -3.1%, #686868 161.36%);
+	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+	border-radius: 100px;
+}
+
+// Popper
+.popper {
+	@apply w-64 p-5 text-gray-600;
+}
+
+.popper-title {
+	@apply mb-2 border-b pb-2 font-bold text-gray-700;
+}
+
+// Button
+.base-btn {
+	@apply my-shadow btn-outline btn-sm btn rounded-2xl border-none bg-white text-black;
+}
+
+// Form
+.base-input {
+	@apply input-bordered input mr-2 w-full rounded-3xl;
+	box-shadow: var(--input-shadow);
+	// Note: box shadow not working on iPhone https://stackoverflow.com/a/15440636/19799243
+	-webkit-appearance: none;
+}
+
+.base-input--rwd {
+	@apply input-sm h-9 lg:h-10;
+}
+
+.base-input--square {
+	@apply input-bordered input mr-2 w-full rounded-xl;
+}
+
+.form-field {
+	@apply flex flex-wrap items-center sm:flex-nowrap;
+}
+
+.form-title {
+	@apply whitespace-nowrap text-base font-bold md:text-xl;
+}
+
+.form-title--rwd {
+	@apply mb-2 w-full sm:mb-0 sm:w-auto;
+}
