@@ -1,8 +1,6 @@
 <script setup lang="ts">
 const router = useRouter()
 
-console.log('------playground-------')
-
 const childRoutes = computed(() => {
 	return router.options.routes.filter(r => r.path.startsWith('/'))
 })

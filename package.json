@@ -8,13 +8,15 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "@nuxtjs/tailwindcss": "^6.4.1",
-    "nuxt": "^3.2.3",
-    "nuxt-headlessui": "^1.1.1"
+    "@nuxtjs/tailwindcss": "^6.6.7",
+    "nuxt": "^3.4.3",
+    "nuxt-headlessui": "^1.1.1",
+    "sass": "^1.62.1"
   },
   "dependencies": {
     "@heroicons/vue": "^2.0.16",
     "@pinia/nuxt": "^0.4.7",
+    "daisyui": "^2.51.6",
     "pinia": "^2.0.33",
     "vue3-google-login": "^2.0.14"
   }
