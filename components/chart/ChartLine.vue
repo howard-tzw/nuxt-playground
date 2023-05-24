@@ -99,6 +99,8 @@ const customLegendPlugin = {
 			throw new Error('Failed to generate labels from chart in customLegend plugin')
 		}
 
+		console.log(items)
+
 		items.map((item: any, i: number) => {
 			if (!options.legends.value[i]) {
 				options.legends.value[i] = {
