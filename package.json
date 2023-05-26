@@ -17,6 +17,7 @@
   "dependencies": {
     "@heroicons/vue": "^2.0.16",
     "@pinia/nuxt": "^0.4.7",
+    "@vorms/core": "^1.1.0",
     "chart.js": "^4.3.0",
     "chartjs-adapter-date-fns": "^3.0.0",
     "daisyui": "^2.51.6",
