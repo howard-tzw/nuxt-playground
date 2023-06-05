@@ -5648,6 +5648,11 @@ vue3-google-login@^2.0.14:
   resolved "https://registry.yarnpkg.com/vue3-google-login/-/vue3-google-login-2.0.14.tgz#bd3e582288a7626caa36023f8c628dec756d49e6"
   integrity sha512-pgrFETY4TWgtAxTv3G7BkfoKUs8+zWB2WRc+jhGpy3fVtU1ll1vAdjGXiQfZ5XADfAJLZ2zNTDJp/0cPF3z7BQ==
 
+vue3-select@0.0.5-beta.14:
+  version "0.0.5-beta.14"
+  resolved "https://registry.yarnpkg.com/vue3-select/-/vue3-select-0.0.5-beta.14.tgz#7c74bf502ea5f533d1bc86722354bd84beded938"
+  integrity sha512-Vw+ehmxto8IKqAAPuTENOspPVbATwfSwLWD2Cl70mVO+XazoyeAAGob3oKSkhEe83RC+vReTW/oE9qFj1e2KVw==
+
 vue@^3.2.47:
   version "3.2.47"
   resolved "https://registry.yarnpkg.com/vue/-/vue-3.2.47.tgz#3eb736cbc606fc87038dbba6a154707c8a34cff0"

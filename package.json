@@ -24,6 +24,7 @@
     "date-fns": "^2.30.0",
     "pinia": "^2.0.33",
     "vue-chartjs": "^5.2.0",
-    "vue3-google-login": "^2.0.14"
+    "vue3-google-login": "^2.0.14",
+    "vue3-select": "0.0.5-beta.14"
   }
 }
