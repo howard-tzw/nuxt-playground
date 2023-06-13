@@ -9,6 +9,8 @@
 	},
 	"dependencies": {
 		"@pinia/nuxt": "0.4.6",
+		"@vueuse/core": "^10.1.2",
+		"@vueuse/nuxt": "^10.1.2",
 		"daisyui": "2.51.6",
 		"pinia": "2.0.30"
 	},
