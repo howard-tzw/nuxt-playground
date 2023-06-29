@@ -46,10 +46,12 @@ const lineChartData = computed(() => {
 		})
 	}
 
-	console.log(datasets)
-
 	datasets = datasets.map(dataset => {
-		let bgColor = dataset.backgroundColor
+		let bgColor = dataset.backgroundColor as string
+
+		if (typeof bgColor === 'string') {
+			throw new Error('ChartApplyTrend - lineChartData: dataset.backgroundColor should be string')
+		}
 
 		return {
 			...dataset,
@@ -68,7 +70,7 @@ const lineChartData = computed(() => {
 				const datasetIndex = context.datasetIndex
 				const datasets = context.chart.data.datasets
 				if (context.type === 'dataset') {
-					return getGradient(30, datasets, datasetIndex, ctx, chartArea, scales, bgColor)
+					return getGradient(0, datasets, datasetIndex, ctx, chartArea, scales, bgColor)
 				}
 			},
 		}
@@ -119,13 +121,13 @@ const chartOptions: ChartOptions = {
 	},
 	plugins: {
 		// @ts-ignore
-		// customLegend: {
-		// 	chartLegendRef,
-		// 	legends,
-		// 	nextTick,
-		// },
+		customLegend: {
+			chartLegendRef,
+			legends,
+			nextTick,
+		},
 		legend: {
-			display: true,
+			display: false,
 			position: 'top',
 			align: 'end',
 			labels: {

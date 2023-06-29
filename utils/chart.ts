@@ -40,7 +40,7 @@ export const customLegendPlugin = {
 		items.forEach((item: LegendItem, i: number) => {
 			options.legends.value[i] = {
 				text: item.text,
-				color: item.fillStyle,
+				color: item.strokeStyle,
 				selected: !item.hidden,
 			}
 		})
@@ -109,6 +109,8 @@ export function getGradient(
 	if (gradientPosPercentage < 0 || gradientPosPercentage > 1) {
 		return null
 	}
+
+	// bug#1 datasetIndex 3 沒有跑一下程式碼，因為 divider 超出合理範圍
 
 	gradientBg.addColorStop(0, convertHexToRGBA(hex, 1))
 	gradientBg.addColorStop(gradientPosPercentage, convertHexToRGBA(hex, 1))

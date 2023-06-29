@@ -167,9 +167,9 @@ const chartStyle = {
 		<div class="section-title">
 			<p>Gradient Line Chart with Custom Legend</p>
 		</div>
-		<div class="max-h-[200px]">
+		<div>
 			<ClientOnly>
-				<div>
+				<div class="max-h-[300px]">
 					<Line :style="chartStyle" chart-id="line-chart" :data="chartData" :options="chartOptions" />
 				</div>
 			</ClientOnly>
