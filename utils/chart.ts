@@ -72,3 +72,48 @@ export const customLegendPlugin = {
 		})
 	},
 }
+
+/**
+ *
+ * @param maxPosOffset
+ * @param datasets
+ * @param datasetIndex
+ * @param ctx
+ * @param chartArea
+ * @param scales
+ * @param hex 必須是 6 位數的 hex
+ */
+export function getGradient(
+	maxPosOffset: number,
+	datasets: any,
+	datasetIndex: any,
+	ctx: any,
+	chartArea: any,
+	scales: any,
+	hex: string,
+) {
+	if (hex.length !== 7) {
+		throw new Error('getGradient: hex must be 6 digit')
+	}
+	const gradientBg = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom) // start x, start y, end x, end y
+	const max = Math.max(...datasets[datasetIndex].data)
+
+	// 不知道為什麼，同一個 dataset 的同一個 max，在後三點的 getGradient 取出的 getPixelForValue 會跟之前取得不一樣，導致 divider 算出來超出合理範圍
+	const maxPos = scales.y.getPixelForValue(max)
+	const lowerPos = maxPos + maxPosOffset
+	const gradientPos = lowerPos - chartArea.top
+	const gradientPosPercentage = gradientPos / chartArea.height
+	const percentageOffset = (1 - gradientPosPercentage) / 2
+
+	// 暫時解決 divider 超出合理範圍的問題
+	if (gradientPosPercentage < 0 || gradientPosPercentage > 1) {
+		return null
+	}
+
+	gradientBg.addColorStop(0, convertHexToRGBA(hex, 1))
+	gradientBg.addColorStop(gradientPosPercentage, convertHexToRGBA(hex, 1))
+	gradientBg.addColorStop(gradientPosPercentage + percentageOffset, convertHexToRGBA(hex, 0.6))
+	gradientBg.addColorStop(1, convertHexToRGBA(hex, 0.4))
+
+	return gradientBg
+}

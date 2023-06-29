@@ -21,36 +21,58 @@ const borderWidth = 2 // 線的粗細度
 const tension = 0.15 // 線的弧度，0 為折線
 
 const lineChartData = computed(() => {
-	const datasets = props.chartData.datasets.map(dataset => ({
-		...dataset,
-		borderColor: dataset.backgroundColor,
-		borderWidth,
-		tension,
-		fill: true, // 線的下方填滿顏色
-	}))
+	let datasets = props.chartData.datasets
 
 	/**
 	 * @feat 加入總和線
 	 */
 	if (props.addTotalLine) {
-		const totalSeries = props.chartData.datasets.reduce((acc, dataset) => {
+		const totalSeries = datasets.reduce((acc, dataset) => {
 			dataset.data.forEach((x, i) => {
 				acc[i] += x
 			})
 			return acc
-		}, Array(props.chartData.datasets[0].data.length).fill(0))
+		}, Array(datasets[0].data.length).fill(0))
 
 		// 總和線
 		datasets.push({
 			label: '總和',
 			data: totalSeries,
-			backgroundColor: convertHexToRGBA(totalColor, 0.5),
-			borderColor: convertHexToRGBA(totalColor, 0.5),
+			backgroundColor: totalColor,
+			borderColor: totalColor,
 			tension,
 			borderWidth,
 			fill: true,
 		})
 	}
+
+	console.log(datasets)
+
+	datasets = datasets.map(dataset => {
+		let bgColor = dataset.backgroundColor
+
+		return {
+			...dataset,
+			borderColor: bgColor,
+			borderWidth,
+			tension,
+			fill: true, // 線的下方填滿顏色
+			backgroundColor: (context: any) => {
+				const chart = context.chart
+
+				const { ctx, chartArea, scales } = chart
+				if (!chartArea) {
+					return null
+				}
+
+				const datasetIndex = context.datasetIndex
+				const datasets = context.chart.data.datasets
+				if (context.type === 'dataset') {
+					return getGradient(30, datasets, datasetIndex, ctx, chartArea, scales, bgColor)
+				}
+			},
+		}
+	})
 
 	const res = {
 		labels: props.chartData.labels,
@@ -97,13 +119,13 @@ const chartOptions: ChartOptions = {
 	},
 	plugins: {
 		// @ts-ignore
-		customLegend: {
-			chartLegendRef,
-			legends,
-			nextTick,
-		},
+		// customLegend: {
+		// 	chartLegendRef,
+		// 	legends,
+		// 	nextTick,
+		// },
 		legend: {
-			display: false,
+			display: true,
 			position: 'top',
 			align: 'end',
 			labels: {
