@@ -9,50 +9,48 @@ const mockData2 = [38, 64, 9, 99, 51, 80, 38]
 
 const randomData = new Array(7).fill(0).map(x => faker.datatype.number({ min: 0, max: 100 }))
 
-const mockDatasets = ref([
+const mockDatasets = [
 	{
 		label: 'My Dataset 2',
 		data: mockData,
-		fill: false,
-		borderColor: '#7CB5D7',
-		tension: 0.1,
+		backgroundColor: convertHexToRGBA('#7CB5D7', 0.5),
 	},
 	{
 		label: 'My Dataset 1',
 		data: mockData2,
-		fill: false,
-		borderColor: '#FD7E56',
-		tension: 0.1,
+		backgroundColor: convertHexToRGBA('#F5A623', 0.5),
 	},
-])
+]
 
-console.log(mockDatasets.value[0].data, mockDatasets.value[1].data)
-
-const lineTension = 0.3 // 線的弧度，0 為折線
-const borderWidth = 1 // 線的粗細度
+const borderWidth = 2 // 線的粗細度
+const tension = 0.15 // 線的弧度，0 為折線
 
 const chartData = computed<ChartData>(() => {
-	const datasets = mockDatasets.value.map(dataset => ({
+	const datasets = mockDatasets.map(dataset => ({
 		...dataset,
-		lineTension,
+		tension,
 		borderWidth,
-		backgroundColor: context => {
-			const chart = context.chart
-
-			const { ctx, chartArea, scales } = chart
-			if (!chartArea) {
-				return null
-			}
-
-			const datasetIndex = context.datasetIndex
-			const datasets = context.chart.data.datasets
-			if (context.type === 'dataset') {
-				return getGradient(30, datasets, datasetIndex, ctx, chartArea, scales, dataset.borderColor)
-			}
-
-			return dataset.borderColor
-		},
 		fill: true,
+		// backgroundColor: (context: any) => {
+		// 	console.log(context)
+		// 	if (context.dataset) {
+		// 		return context.dataset.borderColor
+		// 	}
+		// 	// const chart = context.chart
+
+		// 	// const { ctx, chartArea, scales } = chart
+		// 	// if (!chartArea) {
+		// 	// 	return null
+		// 	// }
+
+		// 	// const datasetIndex = context.datasetIndex
+		// 	// const datasets = context.chart.data.datasets
+		// 	// if (context.type === 'dataset') {
+		// 	// 	return getGradient(30, datasets, datasetIndex, ctx, chartArea, scales, dataset.borderColor)
+		// 	// }
+
+		// 	return
+		// },
 	}))
 
 	return {
@@ -116,14 +114,11 @@ const chartOptions: ChartOptions = {
 				boxHeight: 10,
 			},
 		},
+		// 未使用 custom legend，一般 legend + 漸層效果就會出現問題
 	},
 	// hide points https://stackoverflow.com/questions/35073734/hide-points-in-chartjs-linegraph
 	// @todo 游標滑到點位要能夠輕易顯示資訊，但又要隱藏圓點
-	elements: {
-		point: {
-			radius: 0,
-		},
-	},
+
 	// tooltip interaction modes
 	// https://www.chartjs.org/docs/latest/configuration/interactions.html#modes
 	interaction: {
@@ -134,25 +129,23 @@ const chartOptions: ChartOptions = {
 }
 
 const chartStyle = {
-	height: '100%',
-	width: '200%',
+	// height: '100%',
+	width: '100%',
 	position: 'relative',
 }
 </script>
 
 <template>
-	<div class="dashboard">
-		<div class="dashboard-row">
-			<div class="my-section">
-				<div class="section-title">
-					<p>Gradient Line Chart with Custom Legend</p>
+	<div class="my-section">
+		<div class="section-title">
+			<p>Gradient Line Chart with Custom Legend</p>
+		</div>
+		<div class="max-h-[200px]">
+			<ClientOnly>
+				<div>
+					<Line :style="chartStyle" chart-id="line-chart" :data="chartData" :options="chartOptions" />
 				</div>
-				<ClientOnly>
-					<div>
-						<Line :style="chartStyle" chart-id="line-chart" :data="chartData" :options="chartOptions" />
-					</div>
-				</ClientOnly>
-			</div>
+			</ClientOnly>
 		</div>
 	</div>
 </template>
