@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import type { ChartData, ChartOptions } from 'chart.js'
+import type { ChartData, ChartOptions, ScriptableContext } from 'chart.js'
+import { getGradientBgColor } from '~/plugins/chartjs.client'
 
 const props = withDefaults(
 	defineProps<{
@@ -17,16 +18,14 @@ const props = withDefaults(
 	},
 )
 
-const borderWidth = 2 // 線的粗細度
+const borderWidth = 0.5 // 線的粗細度
 const tension = 0.15 // 線的弧度，0 為折線
 
 const lineChartData = computed(() => {
 	let datasets = props.chartData.datasets
 
-	/**
-	 * @feat 加入總和線
-	 */
-	if (props.addTotalLine) {
+	// 加入總和線
+	if (props.addTotalLine && !datasets.find(dataset => dataset.label === '總和')) {
 		const totalSeries = datasets.reduce((acc, dataset) => {
 			dataset.data.forEach((x, i) => {
 				acc[i] += x
@@ -40,40 +39,36 @@ const lineChartData = computed(() => {
 			data: totalSeries,
 			backgroundColor: totalColor,
 			borderColor: totalColor,
-			tension,
-			borderWidth,
-			fill: true,
 		})
 	}
 
 	datasets = datasets.map(dataset => {
-		let bgColor = dataset.backgroundColor as string
-
-		if (typeof bgColor === 'string') {
-			throw new Error('ChartApplyTrend - lineChartData: dataset.backgroundColor should be string')
-		}
-
+		const bgColor = dataset.backgroundColor as string
 		return {
 			...dataset,
 			borderColor: bgColor,
 			borderWidth,
 			tension,
 			fill: true, // 線的下方填滿顏色
-			backgroundColor: (context: any) => {
-				const chart = context.chart
-
-				const { ctx, chartArea, scales } = chart
-				if (!chartArea) {
-					return null
-				}
-
-				const datasetIndex = context.datasetIndex
-				const datasets = context.chart.data.datasets
-				if (context.type === 'dataset') {
-					return getGradient(0, datasets, datasetIndex, ctx, chartArea, scales, bgColor)
-				}
-			},
+			backgroundColor: (context: ScriptableContext<any>) => getGradientBgColor(context, bgColor),
 		}
+	})
+
+	// 修改 datasets 的順序，讓 lebel 為「行政」的線在最前面，「刑事」的線在第二前面
+	datasets = datasets.slice().sort((a, b) => {
+		if (a.label === '行政') {
+			return -1
+		}
+		if (b.label === '行政') {
+			return 1
+		}
+		if (a.label === '刑事') {
+			return -1
+		}
+		if (b.label === '刑事') {
+			return 1
+		}
+		return 0
 	})
 
 	const res = {
@@ -106,7 +101,6 @@ const chartOptions: ChartOptions = {
 			type: props.isLog ? 'logarithmic' : undefined,
 			min: 0,
 			ticks: {
-				// @ts-ignore
 				precision: 0,
 				callback: value => {
 					return formatNumberWithCommas(value)
@@ -135,7 +129,9 @@ const chartOptions: ChartOptions = {
 				boxHeight: 10,
 			},
 		},
-		tooltip: tooltipConfig,
+		tooltip: {
+			...tooltipConfig,
+		},
 	},
 	// hide points https://stackoverflow.com/questions/35073734/hide-points-in-chartjs-linegraph
 	// @todo 游標滑到點位要能夠輕易顯示資訊，但又要隱藏圓點

@@ -4,8 +4,8 @@ import { ChartData, ChartOptions } from 'chart.js'
 
 const labels = new Array(7).fill('').map(x => faker.lorem.words(1))
 
-const mockData = [68, 60, 6, 0, 35, 49, 6]
-const mockData2 = [38, 64, 0, 99, 51, 80, 38]
+const mockData = [134, 672, 765, 517, 352, 313, 0]
+const mockData2 = [148, 16, 26, 25, 13, 3, 0]
 const mockData3 = [61, 98, 92, 56, 0, 19, 0]
 const mockData4 = [20, 10, 30, 40, 20, 10, 20]
 
@@ -24,18 +24,18 @@ const mockDatasets = [
 		backgroundColor: '#4A90E2',
 		borderColor: '#4A90E2',
 	},
-	// {
-	// 	label: 'My Dataset 3',
-	// 	data: mockData3,
-	// 	backgroundColor: '#7ED321',
-	// 	borderColor: '#7ED321',
-	// },
-	// {
-	// 	label: 'My Dataset 4',
-	// 	data: mockData4,
-	// 	backgroundColor: '#D0021B',
-	// 	borderColor: '#D0021B',
-	// },
+	{
+		label: 'My Dataset 3',
+		data: mockData3,
+		backgroundColor: '#7ED321',
+		borderColor: '#7ED321',
+	},
+	{
+		label: 'My Dataset 4',
+		data: mockData4,
+		backgroundColor: '#D0021B',
+		borderColor: '#D0021B',
+	},
 ]
 
 const borderWidth = 2 // 線的粗細度
@@ -73,7 +73,7 @@ const chartData = computed<ChartData>(() => {
 				const datasetIndex = context.datasetIndex
 				const datasets = context.chart.data.datasets
 				if (context.type === 'dataset') {
-					return getGradient(0, datasets, datasetIndex, ctx, chartArea, scales, bgColor)
+					return getGradient(30, datasets, datasetIndex, ctx, chartArea, scales, bgColor)
 				}
 				return bgColor
 			},
@@ -86,65 +86,29 @@ const chartData = computed<ChartData>(() => {
 	}
 })
 
-function getGradient(maxPosOffset: number, datasets, datasetIndex, ctx, chartArea, scales, hex: string) {
-	const gradientBg = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom) // start x, start y, end x, end y
-	const max = Math.max(...datasets[datasetIndex].data)
-	const maxIndex = datasets[datasetIndex].data.indexOf(max)
+// function getGradient(maxPosOffset: number, datasets, datasetIndex, ctx, chartArea, scales, hex: string) {
+// 	const gradientBg = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom) // start x, start y, end x, end y
+// 	const max = Math.max(...datasets[datasetIndex].data)
 
-	if (datasetIndex === 0) {
-		console.warn('scales 0', scales.y)
-	}
-	if (datasetIndex === 1) {
-		console.warn('scales 1', scales.y)
-	}
-	// 不知道為什麼，同一個 dataset 的同一個 max，在後三點的 getGradient 取出的 getPixelForValue 會跟之前取得不一樣，導致 divider 算出來超出合理範圍
+// 	// 不知道為什麼，同一個 dataset 的同一個 max，在後三點的 getGradient 取出的 getPixelForValue 會跟之前取得不一樣，導致 divider 算出來超出合理範圍
+// 	const maxPos = scales.y.getPixelForValue(max)
+// 	const lowerPos = maxPos + maxPosOffset
+// 	const gradientPos = lowerPos - chartArea.top
+// 	const gradientPosPercentage = gradientPos / chartArea.height
+// 	const percentageOffset = (1 - gradientPosPercentage) / 2
 
-	// 取得序列中最大值的 canvas y 軸位置 docs: https://www.chartjs.org/docs/latest/api/classes/Scale.html#getpixelforvalue
-	// note: canvas 左上角為 (0, 0)
-	const maxPos = scales.y.getPixelForValue(max, maxIndex)
-	// const maxPos = chartArea.top
+// 	// 暫時解決 divider 超出合理範圍的問題
+// 	if (gradientPosPercentage < 0 || gradientPosPercentage > 1) {
+// 		return null
+// 	}
 
-	console.log('datasetIndex, maxPos', datasetIndex, maxPos)
+// 	gradientBg.addColorStop(0, convertHexToRGBA(hex, 1))
+// 	gradientBg.addColorStop(gradientPosPercentage, convertHexToRGBA(hex, 1))
+// 	gradientBg.addColorStop(gradientPosPercentage + percentageOffset, convertHexToRGBA(hex, 0.6))
+// 	gradientBg.addColorStop(1, convertHexToRGBA(hex, 0.4))
 
-	const lowerPos = maxPos + maxPosOffset
-	const gradientPos = lowerPos - chartArea.top
-	const gradientPosPercentage = gradientPos / chartArea.height
-	const percentageOffset = (1 - gradientPosPercentage) / 2
-
-	// 暫時解決 divider 超出合理範圍的問題
-	if (gradientPosPercentage < 0 || gradientPosPercentage > 1) {
-		return null
-	}
-
-	if (datasetIndex === 0) {
-		console.log('============ 0 ==============')
-		console.log('top', chartArea.top)
-		console.log('bottom', chartArea.bottom)
-		console.log('height', chartArea.height)
-		console.log('max', max)
-		console.log('maxPos', maxPos)
-		console.log('lowerPos', lowerPos)
-		console.log('==========================')
-	}
-
-	if (datasetIndex === 1) {
-		console.log('============ 1 ==============')
-		console.log('top', chartArea.top)
-		console.log('bottom', chartArea.bottom)
-		console.log('height', chartArea.height)
-		console.log('max', max)
-		console.log('maxPos', maxPos)
-		console.log('lowerPos', lowerPos)
-		console.log('==========================')
-	}
-
-	gradientBg.addColorStop(0, convertHexToRGBA(hex, 1))
-	gradientBg.addColorStop(gradientPosPercentage, convertHexToRGBA(hex, 1))
-	gradientBg.addColorStop(gradientPosPercentage + percentageOffset, convertHexToRGBA(hex, 0.6))
-	gradientBg.addColorStop(1, convertHexToRGBA(hex, 0.4))
-
-	return gradientBg
-}
+// 	return gradientBg
+// }
 
 const chartOptions: ChartOptions = {
 	responsive: true,
