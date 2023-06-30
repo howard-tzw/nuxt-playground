@@ -27,7 +27,7 @@ export default defineNuxtPlugin(nuxtApp => {
 	}
 })
 
-// Copy to sunshine/plugins/chartjs.client.ts
+// Copy the following to sunshine/utils/chart.ts
 
 /**
  * @feat Custom Legend
@@ -87,8 +87,6 @@ export const customLegendPlugin = {
 		})
 	},
 }
-
-// Copy the following to sunshine/utils/chart.ts
 
 /**
  * Gradient color for line chart
@@ -202,10 +200,10 @@ function getBarGradient(
 		return hex
 	}
 
-	gradientBg.addColorStop(0, convertHexToRGBA(hex, 0.8))
-	gradientBg.addColorStop(divider, convertHexToRGBA(hex, 0.8))
-	gradientBg.addColorStop(divider + d2, convertHexToRGBA(hex, 0.6))
-	gradientBg.addColorStop(1, convertHexToRGBA(hex, 0.4))
+	gradientBg.addColorStop(0, convertHexToRGBA(hex, 0.6))
+	gradientBg.addColorStop(divider, convertHexToRGBA(hex, 0.6))
+	gradientBg.addColorStop(divider + d2, convertHexToRGBA(hex, 0.4))
+	gradientBg.addColorStop(1, convertHexToRGBA(hex, 0.2))
 
 	return gradientBg
 }
