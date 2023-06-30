@@ -9,6 +9,7 @@ import { getGradientBgColor } from '~/plugins/chartjs.client'
  *
  * @bug 較高的 dataset 的 LegendItem 點選後，方塊內顏色會變黑，若有兩條線高度差不多，則兩個都要點，兩個就會一起變黑
  * 	- 問題出在 getPixelForValue(max, maxIndex)
+ *  - 已解決：若 divider 超出合理範圍要回傳 hex
  */
 
 const labels = new Array(7).fill('').map(x => faker.lorem.words(1))

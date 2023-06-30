@@ -88,14 +88,12 @@ export const customLegendPlugin = {
 	},
 }
 
-// Copy to sunshine/plugins/chartjs.client.ts
+// Copy the following to sunshine/utils/chart.ts
 
-function isValidHexColor(color: string) {
-	const pattern = /^#(?:[0-9a-fA-F]{3}){1,2}$/
-	return pattern.test(color)
-}
-
-export function getGradientBgColor(context: ScriptableContext<any>, bgColor: string) {
+/**
+ * Gradient color for line chart
+ */
+export function getGradientBgColor(context: ScriptableContext<'line'>, bgColor: string) {
 	if (!isValidHexColor(bgColor)) {
 		throw new Error('getGradientBgColor: bgColor must be hex')
 	}
@@ -139,15 +137,75 @@ function getGradient(
 	const gradientPosPercentage = gradientPos / chartArea.height
 	const percentageOffset = (1 - gradientPosPercentage) / 2
 
-	// divider 超出合理範圍
+	// 若 divider 超出合理範圍
 	if (gradientPosPercentage < 0 || gradientPosPercentage > 1) {
-		return null
+		return hex
 	}
 
 	gradientBg.addColorStop(0, convertHexToRGBA(hex, 0.5))
 	gradientBg.addColorStop(gradientPosPercentage, convertHexToRGBA(hex, 0.5))
 	gradientBg.addColorStop(gradientPosPercentage + percentageOffset, convertHexToRGBA(hex, 0.3))
 	gradientBg.addColorStop(1, convertHexToRGBA(hex, 0.1))
+
+	return gradientBg
+}
+
+function isValidHexColor(color: string) {
+	const pattern = /^#(?:[0-9a-fA-F]{3}){1,2}$/
+	return pattern.test(color)
+}
+
+/**
+ * Gradient color for bar chart
+ */
+export function getBarGradientBgColor(context: ScriptableContext<'bar'>, bgColor: string) {
+	if (!isValidHexColor(bgColor)) {
+		throw new Error('getBarGradientBgColor: bgColor must be hex')
+	}
+
+	const chart = context.chart
+
+	const { ctx, chartArea, scales } = chart
+	if (!chartArea) {
+		return bgColor
+	}
+
+	const dataIndex = context.dataIndex
+	const datasetIndex = context.datasetIndex
+	const datasets = context.chart.data.datasets
+
+	return getBarGradient(datasets, dataIndex, datasetIndex, ctx, chartArea, scales, bgColor)
+}
+
+function getBarGradient(
+	datasets: ChartDataset[],
+	dataIndex: number,
+	datasetIndex: number,
+	ctx: CanvasRenderingContext2D,
+	chartArea: ChartArea,
+	scales: { [key: string]: Scale },
+	hex: string,
+) {
+	const gradientBg = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom)
+	const upperPos = scales.y.getPixelForValue(datasets[datasetIndex].data[dataIndex] as number)
+	const lowerPos = upperPos + 10
+	const offset = lowerPos - chartArea.top
+
+	const divider = offset / chartArea.height
+	const d2 = (1 - divider) / 2
+
+	if (divider < 0 || divider > 1) {
+		return hex
+	}
+
+	if (divider + d2 < 0 || divider + d2 > 1) {
+		return hex
+	}
+
+	gradientBg.addColorStop(0, convertHexToRGBA(hex, 0.8))
+	gradientBg.addColorStop(divider, convertHexToRGBA(hex, 0.8))
+	gradientBg.addColorStop(divider + d2, convertHexToRGBA(hex, 0.6))
+	gradientBg.addColorStop(1, convertHexToRGBA(hex, 0.4))
 
 	return gradientBg
 }
