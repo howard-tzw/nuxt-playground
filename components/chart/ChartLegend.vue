@@ -5,16 +5,25 @@ const props = defineProps<{
 		color: string
 		selected: boolean
 	}[]
+	sortFn?: (a: any, b: any) => number
 }>()
 
 const legendRef = ref()
+
+const shouldSort = computed(() => {
+	return props.sortFn !== undefined
+})
+
+const sortedLegends = computed(() => {
+	return props.legends.slice().sort(props.sortFn)
+})
 
 defineExpose({ legendRef })
 </script>
 
 <template>
 	<ul ref="legendRef" class="flex flex-row flex-wrap gap-2">
-		<li v-for="legend in legends" :key="legend.text" class="legend-li">
+		<li v-for="legend in shouldSort ? sortedLegends : legends" :key="legend.text" class="legend-li">
 			<div
 				class="mr-1 inline-flex h-4 w-4 items-center justify-center rounded border"
 				:style="{

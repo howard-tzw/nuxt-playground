@@ -1,4 +1,13 @@
-import { Chart, registerables, ScriptableContext, ChartDataset, ChartArea, Scale, LegendItem } from 'chart.js'
+import {
+	Chart,
+	registerables,
+	ScriptableContext,
+	ChartDataset,
+	ChartArea,
+	Scale,
+	LegendItem,
+	ChartConfiguration,
+} from 'chart.js'
 
 import 'chartjs-adapter-date-fns'
 
@@ -18,8 +27,10 @@ export default defineNuxtPlugin(nuxtApp => {
 	}
 })
 
+// Copy to sunshine/plugins/chartjs.client.ts
+
 /**
- * @feat custom legend
+ * @feat Custom Legend
  */
 export const customLegendPlugin = {
 	id: 'customLegend',
@@ -28,40 +39,47 @@ export const customLegendPlugin = {
 		_args: Object,
 		options: { chartLegendRef: Ref<any>; legends: Ref<any[]>; nextTick: () => Promise<void> },
 	) {
+		const { chartLegendRef, legends, nextTick } = options
+
 		const items = chart.options.plugins?.legend?.labels?.generateLabels?.(chart)
 
 		if (!items) {
-			throw new Error('Failed to generate labels from chart in customLegend plugin')
+			throw new Error('customLegendPlugin: Failed to generate labels from chart in customLegend plugin')
 		}
 
 		items.forEach((item: LegendItem, i: number) => {
-			options.legends.value[i] = {
+			legends.value[i] = {
 				text: item.text,
 				color: item.strokeStyle,
 				selected: !item.hidden,
 			}
 		})
 
-		await options.nextTick()
+		await nextTick()
 
-		const el = options.chartLegendRef.value.legendRef
-		if (!el) throw new Error('Failed to get legend element')
+		const el = chartLegendRef.value.legendRef
+		if (!el) throw new Error('customLegendPlugin: Failed to get legend element')
 
 		const nodes = el.children as HTMLCollection
 
 		items.forEach((item, i) => {
-			;(nodes[i] as HTMLElement).onclick = () => {
-				const { type } = chart.config
+			// 利用 item.text 對應的 node.innerText 來綁定 click 事件
+			const node = Array.from(nodes).find(node => (node as HTMLElement).innerText === item.text) as HTMLElement
+			if (!node) throw new Error('customLegendPlugin: Failed to find legend node')
+
+			node.onclick = () => {
+				const { type } = chart.config as ChartConfiguration
+
 				if (type === 'pie' || type === 'doughnut') {
 					// Pie and doughnut charts only have a single dataset and visibility is per item
 					chart.toggleDataVisibility(item.index as number)
-					options.legends.value[i].selected = item.hidden
+					legends.value[i].selected = item.hidden
 				} else {
 					if (item.datasetIndex === undefined) {
 						return
 					}
 					chart.setDatasetVisibility(item.datasetIndex, !chart.isDatasetVisible(item.datasetIndex))
-					options.legends.value[i].selected = chart.isDatasetVisible(item.datasetIndex)
+					legends.value[i].selected = chart.isDatasetVisible(item.datasetIndex)
 				}
 
 				chart.update()
@@ -70,7 +88,18 @@ export const customLegendPlugin = {
 	},
 }
 
+// Copy to sunshine/plugins/chartjs.client.ts
+
+function isValidHexColor(color: string) {
+	const pattern = /^#(?:[0-9a-fA-F]{3}){1,2}$/
+	return pattern.test(color)
+}
+
 export function getGradientBgColor(context: ScriptableContext<any>, bgColor: string) {
+	if (!isValidHexColor(bgColor)) {
+		throw new Error('getGradientBgColor: bgColor must be hex')
+	}
+
 	const chart = context.chart
 
 	const { ctx, chartArea, scales } = chart
@@ -86,15 +115,6 @@ export function getGradientBgColor(context: ScriptableContext<any>, bgColor: str
 	return bgColor
 }
 
-/**
- *
- * @param datasets
- * @param datasetIndex
- * @param ctx
- * @param chartArea
- * @param scales
- * @param hex 必須是 6 位數的 hex
- */
 function getGradient(
 	datasets: ChartDataset[],
 	datasetIndex: number,
@@ -103,7 +123,7 @@ function getGradient(
 	scales: { [key: string]: Scale },
 	hex: string,
 ) {
-	if (hex.length !== 7) {
+	if (!isValidHexColor(hex)) {
 		throw new Error('getGradient: hex must be 6 digit')
 	}
 

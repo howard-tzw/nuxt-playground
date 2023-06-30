@@ -3,7 +3,7 @@ import type { ChartData, ChartOptions } from 'chart.js'
 import { customLegendPlugin } from '~/plugins/chartjs.client'
 
 /**
- * @feat datasets 的順序不影響 legend 的順序
+ * @feat 由於 datasets 的順序會影響 legend 的順序，legendSortFn 可以自訂 legend 的排序
  */
 
 const props = withDefaults(
@@ -49,8 +49,21 @@ const chartData = computed<ChartData>(() => {
 /**
  * @feat Custom Legend
  */
-const chartLegendRef = ref(null)
-const legends = ref<{ text: string; color: string; selected: boolean }[]>([])
+
+type Legend = {
+	text: string
+	color: string
+	selected: boolean
+}
+
+const chartLegendRef = ref()
+const legends = ref<Legend[]>([])
+
+function legendSortFn(a: Legend, b: Legend) {
+	if (a.text > b.text) return 1
+	if (a.text < b.text) return -1
+	return 0
+}
 
 const chartOptions: ChartOptions = {
 	responsive: true,
@@ -102,7 +115,7 @@ const chartStyle = {
 <template>
 	<div class="p-7">
 		<!-- legend -->
-		<ChartLegend ref="chartLegendRef" :legends="legends" />
+		<ChartLegend ref="chartLegendRef" :legends="legends" :sort-fn="legendSortFn" />
 
 		<!-- chart -->
 		<div class="max-h-[300px]">
