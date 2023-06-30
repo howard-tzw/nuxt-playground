@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { ChartData, ChartOptions, ScriptableContext } from 'chart.js'
 import { getGradientBgColor } from '~/plugins/chartjs.client'
+import { customLegendPlugin } from '~/plugins/chartjs.client'
 
 const props = withDefaults(
 	defineProps<{
@@ -54,21 +55,11 @@ const lineChartData = computed(() => {
 		}
 	})
 
-	// 修改 datasets 的順序，讓 lebel 為「行政」的線在最前面，「刑事」的線在第二前面
+	// 從每個 dataset 內取出最大值，讓有最大的最大值的 dataset 在最後面
 	datasets = datasets.slice().sort((a, b) => {
-		if (a.label === '行政') {
-			return -1
-		}
-		if (b.label === '行政') {
-			return 1
-		}
-		if (a.label === '刑事') {
-			return -1
-		}
-		if (b.label === '刑事') {
-			return 1
-		}
-		return 0
+		const maxA = Math.max(...(a.data as number[]))
+		const maxB = Math.max(...(b.data as number[]))
+		return maxA - maxB
 	})
 
 	const res = {
@@ -80,10 +71,45 @@ const lineChartData = computed(() => {
 })
 
 /**
- * @feat Custom Legend
+ * @feat ======================== Custom Legend ========================
  */
-const chartLegendRef = ref(null)
-const legends = ref<{ text: string; color: string; selected: boolean }[]>([])
+
+type Legend = {
+	text: string
+	color: string
+	selected: boolean
+}
+
+const chartLegendRef = ref()
+const legends = ref<Legend[]>([])
+
+function legendSortFn(a: Legend, b: Legend) {
+	if (a.text === '民事') {
+		return -1
+	}
+	if (b.text === '民事') {
+		return 1
+	}
+	if (a.text === '刑事') {
+		return -1
+	}
+	if (b.text === '刑事') {
+		return 1
+	}
+	if (a.text === '行政') {
+		return -1
+	}
+	if (b.text === '行政') {
+		return 1
+	}
+	if (a.text === '總和') {
+		return -1
+	}
+	if (b.text === '總和') {
+		return 1
+	}
+	return 0
+}
 
 const chartOptions: ChartOptions = {
 	responsive: true,
@@ -168,7 +194,8 @@ const chartStyle = {
 			<div class="section-title flex">
 				<slot></slot>
 			</div>
-			<ChartLegend ref="chartLegendRef" :legends="legends" />
+			<!-- ======================== Custom Legend ======================== -->
+			<ChartLegend ref="chartLegendRef" :legends="legends" :sort-fn="legendSortFn" />
 		</div>
 
 		<!-- Note: 線圖會拉很長，因此限制最大高度 -->

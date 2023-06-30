@@ -47,7 +47,7 @@ const chartData = computed<ChartData>(() => {
 })
 
 /**
- * @feat Custom Legend
+ * @feat ======================== Custom Legend ========================
  */
 
 type Legend = {
@@ -86,7 +86,7 @@ const chartOptions: ChartOptions = {
 			display: false,
 		},
 		/**
-		 * Custom Legend
+		 * @feat ======================== Custom Legend ========================
 		 */
 		customLegend: {
 			chartLegendRef,
@@ -114,7 +114,7 @@ const chartStyle = {
 
 <template>
 	<div class="p-7">
-		<!-- legend -->
+		<!-- ======================== Custom Legend ======================== -->
 		<ChartLegend ref="chartLegendRef" :legends="legends" :sort-fn="legendSortFn" />
 
 		<!-- chart -->

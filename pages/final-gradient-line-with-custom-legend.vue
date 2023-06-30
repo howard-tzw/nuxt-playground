@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { faker } from '@faker-js/faker'
-import { ChartData, ChartOptions } from 'chart.js'
+import { ChartOptions, ScriptableContext } from 'chart.js'
+import { getGradientBgColor } from '~/plugins/chartjs.client'
+import { customLegendPlugin } from '~/plugins/chartjs.client'
 
 const labels = new Array(7).fill('').map(x => faker.lorem.words(1))
 
@@ -38,22 +40,15 @@ const mockDatasets = [
 	},
 ]
 
-const borderWidth = 2 // 線的粗細度
+const borderWidth = 0.5 // 線的粗細度
 const tension = 0.15 // 線的弧度，0 為折線
 
 /**
  * legend 刪除時，方塊內的顏色會變灰色，而且只有 My Dataset 2 有此情況， why?
  */
 
-const chartData = computed<ChartData>(() => {
-	// mockDatasets.push({
-	// 	label: 'My Dataset 4',
-	// 	data: mockData4,
-	// 	backgroundColor: '#D0021B',
-	// 	borderColor: '#D0021B',
-	// })
-
-	const datasets = mockDatasets.map(dataset => {
+const chartData = computed(() => {
+	let datasets = mockDatasets.map(dataset => {
 		let bgColor = dataset.backgroundColor
 
 		return {
@@ -62,22 +57,18 @@ const chartData = computed<ChartData>(() => {
 			borderWidth,
 			fill: true,
 			borderColor: bgColor,
-			backgroundColor: (context: any) => {
-				const chart = context.chart
-
-				const { ctx, chartArea, scales } = chart
-				if (!chartArea) {
-					return bgColor
-				}
-
-				const datasetIndex = context.datasetIndex
-				const datasets = context.chart.data.datasets
-				if (context.type === 'dataset') {
-					return getGradient(30, datasets, datasetIndex, ctx, chartArea, scales, bgColor)
-				}
-				return bgColor
-			},
+			backgroundColor: (context: ScriptableContext<any>) => getGradientBgColor(context, bgColor),
 		}
+	})
+
+	/**
+	 * @feat 依照線圖高度進行排序
+	 * 從每個 dataset 內取出最大值，比較 datasets 的最大值，讓有最大的最大值的 dataset 在最後面
+	 */
+	datasets = datasets.slice().sort((a, b) => {
+		const maxA = Math.max(...(a.data as number[]))
+		const maxB = Math.max(...(b.data as number[]))
+		return maxA - maxB
 	})
 
 	return {
@@ -86,29 +77,24 @@ const chartData = computed<ChartData>(() => {
 	}
 })
 
-// function getGradient(maxPosOffset: number, datasets, datasetIndex, ctx, chartArea, scales, hex: string) {
-// 	const gradientBg = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom) // start x, start y, end x, end y
-// 	const max = Math.max(...datasets[datasetIndex].data)
+/**
+ * @feat ======================== Custom Legend ========================
+ */
 
-// 	// 不知道為什麼，同一個 dataset 的同一個 max，在後三點的 getGradient 取出的 getPixelForValue 會跟之前取得不一樣，導致 divider 算出來超出合理範圍
-// 	const maxPos = scales.y.getPixelForValue(max)
-// 	const lowerPos = maxPos + maxPosOffset
-// 	const gradientPos = lowerPos - chartArea.top
-// 	const gradientPosPercentage = gradientPos / chartArea.height
-// 	const percentageOffset = (1 - gradientPosPercentage) / 2
+type Legend = {
+	text: string
+	color: string
+	selected: boolean
+}
 
-// 	// 暫時解決 divider 超出合理範圍的問題
-// 	if (gradientPosPercentage < 0 || gradientPosPercentage > 1) {
-// 		return null
-// 	}
+const chartLegendRef = ref()
+const legends = ref<Legend[]>([])
 
-// 	gradientBg.addColorStop(0, convertHexToRGBA(hex, 1))
-// 	gradientBg.addColorStop(gradientPosPercentage, convertHexToRGBA(hex, 1))
-// 	gradientBg.addColorStop(gradientPosPercentage + percentageOffset, convertHexToRGBA(hex, 0.6))
-// 	gradientBg.addColorStop(1, convertHexToRGBA(hex, 0.4))
-
-// 	return gradientBg
-// }
+function legendSortFn(a: Legend, b: Legend) {
+	if (a.text > b.text) return 1
+	if (a.text < b.text) return -1
+	return 0
+}
 
 const chartOptions: ChartOptions = {
 	responsive: true,
@@ -116,24 +102,26 @@ const chartOptions: ChartOptions = {
 	scales: {
 		x: {
 			grid: {
-				display: false, // 隱藏 x 軸網格線
+				display: false,
 			},
 		},
 		y: {
 			min: 0,
-			ticks: {
-				// precision: 0,
-				// stepSize: 100, // https://www.chartjs.org/docs/latest/axes/cartesian/linear.html#step-size
-			},
 			beginAtZero: true,
-
 			suggestedMin: 1,
-			// suggestedMax: 1000,
-			// max: 1000,
 		},
 	},
 	plugins: {
+		/**
+		 * @feat ======================== Custom Legend ========================
+		 */
+		customLegend: {
+			chartLegendRef,
+			legends,
+			nextTick,
+		},
 		legend: {
+			display: false,
 			position: 'top',
 			align: 'end',
 			labels: {
@@ -163,14 +151,24 @@ const chartStyle = {
 </script>
 
 <template>
-	<div class="my-section">
-		<div class="section-title">
+	<div class="">
+		<div class="p-5 text-center">
 			<p>Gradient Line Chart with Custom Legend</p>
 		</div>
+
+		<!-- ======================== Custom Legend ======================== -->
+		<ChartLegend ref="chartLegendRef" :legends="legends" :sort-fn="legendSortFn" />
+
 		<div>
 			<ClientOnly>
 				<div class="max-h-[300px]">
-					<Line :style="chartStyle" chart-id="line-chart" :data="chartData" :options="chartOptions" />
+					<Line
+						:style="chartStyle"
+						chart-id="line-chart"
+						:data="chartData"
+						:options="chartOptions"
+						:plugins="[customLegendPlugin]"
+					/>
 				</div>
 			</ClientOnly>
 		</div>

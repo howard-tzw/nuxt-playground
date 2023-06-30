@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { faker } from '@faker-js/faker'
-import { ChartOptions, ChartDataset, ScriptableContext, ChartArea, Scale } from 'chart.js'
-
+import { ChartOptions, ScriptableContext } from 'chart.js'
+import { getGradientBgColor } from '~/plugins/chartjs.client'
 /**
  * Final Gradient Line Chart
  * @feat 一頁成型，不依賴其他函式
@@ -66,96 +66,19 @@ const chartData = computed(() => {
 
 	/**
 	 * @feat 依照線圖高度進行排序
+	 * 從每個 dataset 內取出最大值，比較 datasets 的最大值，讓有最大的最大值的 dataset 在最後面
 	 */
-
-	console.log(datasets)
-
-	// 從每個 dataset 內取出最大值，比較 datasets 的最大值，讓有最大的最大值的 dataset 在最後面
 	datasets = datasets.slice().sort((a, b) => {
 		const maxA = Math.max(...(a.data as number[]))
 		const maxB = Math.max(...(b.data as number[]))
 		return maxA - maxB
 	})
 
-	console.log('sorted', datasets)
-
 	return {
 		labels: labels,
 		datasets,
 	}
 })
-
-/**
- * ===================== Copy to chartjs.client.ts <start> =====================
- */
-
-// import { ChartDataset, ScriptableContext, ChartArea, Scale } from 'chart.js'
-
-function isValidHexColor(color: string) {
-	const pattern = /^#(?:[0-9a-fA-F]{3}){1,2}$/
-	return pattern.test(color)
-}
-
-function getGradientBgColor(context: ScriptableContext<any>, bgColor: string) {
-	if (!isValidHexColor(bgColor)) {
-		throw new Error('getGradientBgColor: bgColor must be hex')
-	}
-
-	const chart = context.chart
-
-	const { ctx, chartArea, scales } = chart
-	if (!chartArea) {
-		return bgColor
-	}
-
-	const datasetIndex = context.datasetIndex
-	const datasets = context.chart.data.datasets
-	if (context.type === 'dataset') {
-		return getGradient(datasets, datasetIndex, ctx, chartArea, scales, bgColor)
-	}
-	return bgColor
-}
-
-function getGradient(
-	datasets: ChartDataset[],
-	datasetIndex: number,
-	ctx: CanvasRenderingContext2D,
-	chartArea: ChartArea,
-	scales: { [key: string]: Scale },
-	hex: string,
-) {
-	if (!isValidHexColor(hex)) {
-		throw new Error('getGradient: hex must be 6 digit')
-	}
-
-	const gradientBg = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom) // start x, start y, end x, end y
-	const max = Math.max(...(datasets[datasetIndex].data as number[]))
-	const maxIndex = datasets[datasetIndex].data.indexOf(max)
-
-	// 取得序列中最大值的 canvas y 軸位置 docs: https://www.chartjs.org/docs/latest/api/classes/Scale.html#getpixelforvalue
-	// note: canvas 左上角為 (0, 0)
-	const maxPos = scales.y.getPixelForValue(max, maxIndex)
-
-	const gradientPos = maxPos - chartArea.top
-	const gradientPosPercentage = gradientPos / chartArea.height
-	const percentageOffset = (1 - gradientPosPercentage) / 2
-
-	// divider 超出合理範圍
-	if (gradientPosPercentage < 0 || gradientPosPercentage > 1) {
-		return null
-	}
-
-	gradientBg.addColorStop(0, convertHexToRGBA(hex, 0.5))
-	gradientBg.addColorStop(gradientPosPercentage, convertHexToRGBA(hex, 0.5))
-	gradientBg.addColorStop(gradientPosPercentage + percentageOffset, convertHexToRGBA(hex, 0.3))
-	gradientBg.addColorStop(1, convertHexToRGBA(hex, 0.1))
-
-	return gradientBg
-}
-
-/**
- * ===================== Copy to chartjs.client.ts <end> =====================
- */
 
 const chartOptions: ChartOptions = {
 	responsive: true,
@@ -213,8 +136,8 @@ const chartStyle = {
 </script>
 
 <template>
-	<div class="my-section">
-		<div class="section-title">
+	<div class="">
+		<div class="p-5 text-center">
 			<p>Gradient Line Chart</p>
 		</div>
 		<div>
