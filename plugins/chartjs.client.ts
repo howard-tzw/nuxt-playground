@@ -50,7 +50,7 @@ export const customLegendPlugin = {
 		items.forEach((item: LegendItem, i: number) => {
 			legends.value[i] = {
 				text: item.text,
-				color: item.strokeStyle,
+				color: item.strokeStyle, //  datasets 需要有 borderColor 才能在此取得並為 legend 上色
 				selected: !item.hidden,
 			}
 		})
