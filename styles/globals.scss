@@ -1,0 +1,16 @@
+body {
+	overflow-y: scroll; // Note: always show vertical scrollbar
+}
+
+h1 {
+}
+
+// 移除 form 相關元件的 outline
+// https://stackoverflow.com/questions/18085053/scss-css-selector-to-select-all-input-types
+textarea,
+textarea.textarea,
+select,
+select.select,
+input[type] {
+	@apply outline-0 focus:outline-0;
+}

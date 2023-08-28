@@ -1,0 +1,63 @@
+@import './utils.scss';
+
+// ==================== Menu ====================
+
+.menu-link {
+	@apply rounded-md px-4 py-2 hover:bg-gray-200 md:flex md:min-w-[80px] md:justify-center lg:px-4;
+}
+
+.menu-link--active {
+	@apply font-semibold;
+}
+
+// ==================== Judge ====================
+
+.judge-badge {
+	@apply badge border-none px-3 py-4 text-black;
+}
+
+.judge-badge--active {
+	color: white;
+	background: linear-gradient(101.6deg, #44dcfd -3.1%, #b923ff 161.36%);
+	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+	border-radius: 100px;
+}
+
+.judge-badge--inactive {
+	color: white;
+	background: linear-gradient(101.6deg, #dddddd -3.1%, #686868 161.36%);
+	box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.1);
+	border-radius: 100px;
+}
+
+// ==================== Popper ====================
+
+.popper {
+	@apply w-64 p-5 text-gray-600;
+}
+
+.popper-title {
+	@apply mb-2 border-b pb-2 font-bold text-gray-700;
+}
+
+// ==================== Button ====================
+
+.base-btn {
+	@apply my-shadow btn-outline btn-sm btn rounded-2xl border-none bg-white text-black;
+}
+
+.error-btn {
+	@apply hover:opacity-70;
+	width: 100px;
+	height: 40px;
+	color: white;
+	background: linear-gradient(0deg, #a6141d, #a6141d), #d9d9d9;
+	box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+	border-radius: 10px;
+}
+
+// ==================== Record ====================
+
+.record-base {
+	@apply rounded-lg border border-gray-300 bg-white font-normal text-black;
+}
