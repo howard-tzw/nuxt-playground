@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const breakpoints = require('./breakpoints.json')
+
 module.exports = {
 	content: [
 		'./components/**/*.{vue,js,ts}',
@@ -10,11 +12,17 @@ module.exports = {
 		'./content/**/*.md',
 	],
 	theme: {
-		screens: {
-			sm: '480px',
-			md: '768px',
-			lg: '976px',
-			xl: '1440px',
+		screens: breakpoints,
+		extend: {
+			colors: {
+				primary: {
+					DEFAULT: '#333333',
+				},
+				// 同步 styles/vars --color-secondary
+				secondary: {
+					DEFAULT: '#0e9cff',
+				},
+			},
 		},
 		// backgroundSize: {
 		// 	auto: 'auto',
@@ -24,8 +32,5 @@ module.exports = {
 		// 	16: '4rem',
 		// },
 	},
-	plugins: [require('daisyui')],
-	daisyui: {
-		themes: ['light'],
-	},
+	plugins: [],
 }
